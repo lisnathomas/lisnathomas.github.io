@@ -1,0 +1,267 @@
+---
+import Icon from './Icon.astro';
+import SectionHeading from './SectionHeading.astro';
+import TodoMark from './TodoMark.astro';
+import { isTodo, person } from '../data/profile';
+import { DEFAULT_SUBJECT, buildMailto } from '../lib/mailto';
+
+const fallbackHref = buildMailto(person.email, { summary: '', details: '', expected: '' });
+---
+
+<section id="contact" class="section" aria-labelledby="contact-title">
+  <div class="container">
+    <SectionHeading id="contact" index={7} file="ISSUE_TEMPLATE/contact.md" title="Contact">
+      <p>Open a ticket. It drafts an email in your own mail app, so nothing is sent or stored by this site.</p>
+    </SectionHeading>
+
+    <div class="contact">
+      <form
+        class="ticket"
+        action={`mailto:${person.email}`}
+        method="get"
+        data-ticket
+        data-email={person.email}
+        data-default-subject={DEFAULT_SUBJECT}
+        aria-labelledby="ticket-title"
+      >
+        <div class="ticket__bar mono">
+          <Icon name="ticket" />
+          <span id="ticket-title">New ticket</span>
+          <span class="ticket__to">to: {person.email}</span>
+        </div>
+
+        <div class="ticket__fields">
+          <div class="field">
+            <label for="ticket-summary">Summary</label>
+            <p class="field__hint" id="ticket-summary-hint">One line: what is this about?</p>
+            <input id="ticket-summary" name="summary" type="text" autocomplete="off" aria-describedby="ticket-summary-hint" />
+          </div>
+
+          <div class="field">
+            <label for="ticket-details">Details</label>
+            <p class="field__hint" id="ticket-details-hint">The role, project or question, with any context that helps.</p>
+            <textarea id="ticket-details" name="details" rows="4" aria-describedby="ticket-details-hint"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="ticket-expected">Expected outcome</label>
+            <p class="field__hint" id="ticket-expected-hint">What would a good result look like? A call, a reply, a review?</p>
+            <textarea id="ticket-expected" name="expected" rows="2" aria-describedby="ticket-expected-hint"></textarea>
+          </div>
+
+          <div class="ticket__actions">
+            <a class="btn btn--primary" href={fallbackHref} data-ticket-link>
+              <Icon name="mail" /> Open ticket in your email app
+            </a>
+          </div>
+        </div>
+      </form>
+
+      <aside class="direct" aria-labelledby="direct-title">
+        <h3 id="direct-title">Or reach me directly</h3>
+        <ul class="direct__list" role="list">
+          <li>
+            <Icon name="mail" />
+            <a href={`mailto:${person.email}`}>{person.email}</a>
+          </li>
+          <li>
+            <Icon name="github" />
+            <a href={person.github} rel="me">github.com/lisnathomas</a>
+          </li>
+          <li>
+            <Icon name="linkedin" />
+            {
+              isTodo(person.linkedin) ? (
+                <TodoMark label={person.linkedin.todo} />
+              ) : (
+                <a href={person.linkedin} rel="me">
+                  LinkedIn
+                </a>
+              )
+            }
+          </li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { buildMailto } from '../lib/mailto';
+
+  const form = document.querySelector<HTMLFormElement>('[data-ticket]');
+  const link = document.querySelector<HTMLAnchorElement>('[data-ticket-link]');
+
+  if (form && link) {
+    const email = form.dataset['email'] ?? '';
+    const value = (name: string) => {
+      const field = form.elements.namedItem(name);
+      return field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement ? field.value : '';
+    };
+    const update = () => {
+      link.href = buildMailto(email, {
+        summary: value('summary'),
+        details: value('details'),
+        expected: value('expected'),
+      });
+    };
+
+    form.addEventListener('input', update);
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      update();
+      window.location.href = link.href;
+    });
+    update();
+  }
+</script>
+
+<style>
+  .contact {
+    display: grid;
+    gap: var(--space-7);
+    align-items: start;
+  }
+
+  @media (min-width: 60rem) {
+    .contact {
+      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    }
+  }
+
+  .ticket {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+
+  .ticket__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    padding: var(--space-3) var(--space-5);
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-2);
+    font-size: var(--step--1);
+    font-weight: 700;
+  }
+
+  .ticket__bar :global(svg) {
+    width: 1.2rem;
+    height: 1.2rem;
+    color: var(--accent);
+  }
+
+  .ticket__to {
+    margin-left: auto;
+    color: var(--ink-2);
+    font-weight: 400;
+    overflow-wrap: anywhere;
+  }
+
+  .ticket__fields {
+    display: grid;
+    gap: var(--space-5);
+    padding: var(--space-5);
+  }
+
+  @media (min-width: 48rem) {
+    .ticket__fields {
+      padding: var(--space-6);
+    }
+  }
+
+  .field {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .field label {
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
+
+  .field label::before {
+    content: '## ';
+    color: var(--accent);
+  }
+
+  .field__hint {
+    color: var(--ink-2);
+    font-size: var(--step--1);
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    margin-top: var(--space-1);
+    padding: var(--space-3) var(--space-4);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 5rem;
+  }
+
+  input:hover,
+  textarea:hover {
+    border-color: var(--accent);
+  }
+
+  input:focus-visible,
+  textarea:focus-visible {
+    outline-offset: 1px;
+    border-color: var(--accent);
+  }
+
+  .ticket__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  /* ---------- direct links ---------- */
+  .direct {
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .direct h3 {
+    font-size: var(--step-0);
+    font-family: var(--font-mono);
+    color: var(--ink-2);
+  }
+
+  .direct__list {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .direct__list li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 2.75rem;
+    overflow-wrap: anywhere;
+  }
+
+  .direct__list :global(svg) {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex: none;
+    color: var(--ink-2);
+  }
+</style>
