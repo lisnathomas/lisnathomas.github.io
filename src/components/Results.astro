@@ -1,0 +1,140 @@
+---
+import Icon from './Icon.astro';
+import SectionHeading from './SectionHeading.astro';
+import { results } from '../data/profile';
+---
+
+<section id="results" class="section" aria-labelledby="results-title">
+  <div class="container">
+    <SectionHeading id="results" index={3} file="results.summary" title="Results">
+      <p>Real numbers from real projects, reported the way a test run reports them.</p>
+    </SectionHeading>
+
+    <div class="summary">
+      <dl class="summary__head mono">
+        <div>
+          <dt>Tests:</dt>
+          <dd><span class="summary__pass">{results.length} passed</span>, {results.length} total</dd>
+        </div>
+        <div>
+          <dt>Failed:</dt>
+          <dd>0</dd>
+        </div>
+        <div>
+          <dt>Time:</dt>
+          <dd>6+ years</dd>
+        </div>
+      </dl>
+
+      <ul class="results" role="list" data-testid="results-list">
+        {
+          results.map((r) => (
+            <li class="result">
+              <span class="check">
+                <Icon name="check" />
+              </span>
+              <span class="sr-only">Passed:</span>
+              <span class="result__value mono">{r.value}</span>
+              <span class="result__label">{r.label}</span>
+              <span class="result__context">{r.context}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .summary {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+
+  .summary__head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-6);
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-2);
+    font-size: var(--step--1);
+  }
+
+  .summary__head div {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .summary__head dt {
+    color: var(--ink-2);
+    font-weight: 700;
+  }
+
+  .summary__pass {
+    color: var(--pass);
+    font-weight: 700;
+  }
+
+  .results {
+    margin: 0;
+  }
+
+  .result {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: var(--space-4);
+    row-gap: var(--space-1);
+    align-items: baseline;
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .result + .result {
+    border-top: 1px solid var(--line);
+  }
+
+  .result .check {
+    grid-row: span 3;
+    align-self: start;
+    margin-top: 0.35em;
+  }
+
+  .result__value {
+    white-space: nowrap;
+    font-size: var(--step-2);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+
+  .result__label {
+    font-size: var(--step-0);
+    font-weight: 600;
+  }
+
+  .result__context {
+    color: var(--ink-2);
+    font-size: var(--step--1);
+  }
+
+  @media (min-width: 48rem) {
+    .result {
+      grid-template-columns: auto 10rem minmax(0, 1fr) minmax(0, 1fr);
+      align-items: center;
+      padding: var(--space-4) var(--space-6);
+    }
+
+    .result .check {
+      grid-row: auto;
+      margin-top: 0;
+      align-self: center;
+    }
+
+    .result__context {
+      text-align: right;
+    }
+  }
+</style>
