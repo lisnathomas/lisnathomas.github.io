@@ -13,7 +13,7 @@ interface Props {
 
 const {
   title = `${person.name} · QA Engineer, healthcare focus`,
-  description = 'QA Engineer with 6+ years across healthcare IT, regulated gaming and enterprise web and mobile applications. HL7 and FHIR knowledge, C# and Java test automation, AI-assisted testing.',
+  description = 'QA Engineer with 6+ years in healthcare IT, regulated gaming and enterprise apps. HL7 and FHIR, C# and Java test automation, AI-assisted testing.',
   noindex = false,
 } = Astro.props;
 
@@ -74,6 +74,7 @@ const personLd = {
     <meta name="theme-color" content="#f8f7f3" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0b1521" media="(prefers-color-scheme: dark)" />
     <meta name="color-scheme" content="light dark" />
+    <meta name="format-detection" content="telephone=no" />
 
     <link rel="preload" href={sansFont} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={monoFont} as="font" type="font/woff2" crossorigin />

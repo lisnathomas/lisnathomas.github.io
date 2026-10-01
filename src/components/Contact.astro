@@ -110,7 +110,7 @@ const fallbackHref = buildMailto(person.email, { summary: '', details: '', expec
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       update();
-      window.location.href = link.href;
+      link.click();
     });
     update();
   }

@@ -4,25 +4,78 @@
  * text, 3:1 for UI boundaries) in both themes. The terminal palette is shared
  * by both themes so code panels always read as "a real terminal".
  */
+/*
+ * Theme switching swaps whole token sets on :root (system preference unless
+ * data-theme is set by the toggle). Deliberately not light-dark(): WebKit
+ * does not re-resolve it on every inherited colour when the theme changes at
+ * runtime, which the cross-browser suite caught.
+ */
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 
-  --bg: light-dark(#f8f7f3, #0b1521);
-  --surface: light-dark(#ffffff, #101d2c);
-  --surface-2: light-dark(#efeee8, #16263a);
-  --ink: light-dark(#0f1e33, #e8edf3);
-  --ink-2: light-dark(#475569, #a7b4c4);
-  --line: light-dark(#e1dfd7, #1f3247);
-  --border: light-dark(#7a8494, #5e7088);
-  --accent: light-dark(#0a6b66, #5ed3c6);
-  --accent-soft: light-dark(#e0f0ee, #12333a);
-  --on-accent: light-dark(#ffffff, #0b1521);
-  --pass: light-dark(#17703a, #5bd37a);
-  --pass-soft: light-dark(#e3f2e8, #12301f);
-  --todo: light-dark(#8a4b00, #f2b66d);
-  --todo-soft: light-dark(#fbf0e1, #2e2213);
-  --shadow: light-dark(0 1px 2px rgb(15 30 51 / 6%), 0 1px 2px rgb(0 0 0 / 30%));
-  --shadow-lg: light-dark(0 12px 32px -12px rgb(15 30 51 / 22%), 0 12px 32px -12px rgb(0 0 0 / 60%));
+  --bg: #f8f7f3;
+  --surface: #ffffff;
+  --surface-2: #efeee8;
+  --ink: #0f1e33;
+  --ink-2: #475569;
+  --line: #e1dfd7;
+  --border: #7a8494;
+  --accent: #0a6b66;
+  --accent-soft: #e0f0ee;
+  --on-accent: #ffffff;
+  --pass: #17703a;
+  --pass-soft: #e3f2e8;
+  --todo: #8a4b00;
+  --todo-soft: #fbf0e1;
+  --shadow: 0 1px 2px rgb(15 30 51 / 6%);
+  --shadow-lg: 0 12px 32px -12px rgb(15 30 51 / 22%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --bg: #0b1521;
+    --surface: #101d2c;
+    --surface-2: #16263a;
+    --ink: #e8edf3;
+    --ink-2: #a7b4c4;
+    --line: #1f3247;
+    --border: #5e7088;
+    --accent: #5ed3c6;
+    --accent-soft: #12333a;
+    --on-accent: #0b1521;
+    --pass: #5bd37a;
+    --pass-soft: #12301f;
+    --todo: #f2b66d;
+    --todo-soft: #2e2213;
+    --shadow: 0 1px 2px rgb(0 0 0 / 30%);
+    --shadow-lg: 0 12px 32px -12px rgb(0 0 0 / 60%);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #0b1521;
+  --surface: #101d2c;
+  --surface-2: #16263a;
+  --ink: #e8edf3;
+  --ink-2: #a7b4c4;
+  --line: #1f3247;
+  --border: #5e7088;
+  --accent: #5ed3c6;
+  --accent-soft: #12333a;
+  --on-accent: #0b1521;
+  --pass: #5bd37a;
+  --pass-soft: #12301f;
+  --todo: #f2b66d;
+  --todo-soft: #2e2213;
+  --shadow: 0 1px 2px rgb(0 0 0 / 30%);
+  --shadow-lg: 0 12px 32px -12px rgb(0 0 0 / 60%);
+}
+
+:root {
 
   --term-bg: #0a1420;
   --term-bar: #111f30;
@@ -63,8 +116,6 @@
   --header-h: 4rem;
 }
 
-:root[data-theme='light'] { color-scheme: light; }
-:root[data-theme='dark'] { color-scheme: dark; }
 
 /* ---------- reset ---------- */
 *,
@@ -224,14 +275,18 @@ code, kbd, pre, .mono { font-family: var(--font-mono); font-size: 0.92em; }
 
 .check svg { width: 0.85em; height: 0.85em; }
 
+/*
+ * Reduced motion: no animation or transition at all, so every element simply
+ * shows its final state. (The common "0.01ms duration" trick turns the default
+ * transition-property: all into real transitions on every element, which
+ * left inherited colours stale in WebKit after a theme switch.)
+ */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    animation-delay: 0ms !important;
-    transition-duration: 0.01ms !important;
+    animation: none !important;
+    transition: none !important;
   }
 }
 
