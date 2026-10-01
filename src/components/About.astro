@@ -1,0 +1,374 @@
+---
+import Icon from './Icon.astro';
+import Monogram from './Monogram.astro';
+import SectionHeading from './SectionHeading.astro';
+import TodoMark from './TodoMark.astro';
+import { about, isTodo, person } from '../data/profile';
+import { practitioner, practitionerJson } from '../data/fhir';
+import { highlightJson } from '../lib/highlight-json';
+
+const jsonHtml = highlightJson(practitionerJson);
+---
+
+<section id="about" class="section" aria-labelledby="about-title">
+  <div class="container">
+    <SectionHeading id="about" index={1} file="profile.json" title="About" />
+
+    <div class="about">
+      <div class="about__text">
+        {about.paragraphs.map((p) => <p>{p}</p>)}
+
+        <h3 class="about__subhead">Domains I've tested</h3>
+        <ul class="domains" role="list">
+          {
+            about.domains.map((d) => (
+              <li>
+                <span class="check">
+                  <Icon name="check" />
+                </span>
+                <span>
+                  <strong>{d.name}</strong>
+                  {d.detail && <span class="muted"> ({d.detail})</span>}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="profile">
+        <div class="fhir-switch">
+          <button
+            type="button"
+            role="switch"
+            aria-checked="false"
+            aria-controls="profile-card profile-fhir"
+            class="switch"
+            data-fhir-switch
+          >
+            <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
+            <span class="switch__label">View as FHIR</span>
+          </button>
+        </div>
+
+        <article id="profile-card" class="profile-card" aria-label="Profile card" data-testid="profile-card">
+          <header class="profile-card__head">
+            <Monogram size="lg" />
+            <div>
+              <p class="profile-card__name">{person.name}</p>
+              <p class="muted">QA Engineer · Healthcare focus</p>
+            </div>
+          </header>
+          <dl class="fields">
+            <div>
+              <dt>Email</dt>
+              <dd><a href={`mailto:${person.email}`}>{person.email}</a></dd>
+            </div>
+            <div>
+              <dt>Qualifications</dt>
+              <dd>
+                <ul role="list" class="fields__list">
+                  {about.qualifications.map((q) => <li>{q}</li>)}
+                </ul>
+              </dd>
+            </div>
+            <div>
+              <dt>Education</dt>
+              <dd>
+                {isTodo(person.education) ? <TodoMark label={person.education.todo} /> : person.education}
+              </dd>
+            </div>
+            <div>
+              <dt>Links</dt>
+              <dd class="fields__links">
+                <a href={person.github} rel="me">GitHub</a>
+                {
+                  isTodo(person.linkedin) ? (
+                    <TodoMark label={person.linkedin.todo} />
+                  ) : (
+                    <a href={person.linkedin} rel="me">
+                      LinkedIn
+                    </a>
+                  )
+                }
+              </dd>
+            </div>
+          </dl>
+        </article>
+
+        <figure id="profile-fhir" class="fhir" hidden data-testid="profile-fhir">
+          <div class="fhir__bar mono" aria-hidden="true">
+            <span><span class="fhir__verb">GET</span> /Practitioner/{practitioner.id}</span>
+            <span class="fhir__ok">200 OK</span>
+          </div>
+          <pre class="fhir__code"><code
+              data-fhir-json
+              set:html={jsonHtml}
+            /></pre>
+          <figcaption class="fhir__caption">My profile, as a healthcare system would see it.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const fhirSwitch = document.querySelector<HTMLButtonElement>('[data-fhir-switch]');
+  const card = document.getElementById('profile-card');
+  const fhir = document.getElementById('profile-fhir');
+
+  fhirSwitch?.addEventListener('click', () => {
+    const on = fhirSwitch.getAttribute('aria-checked') !== 'true';
+    fhirSwitch.setAttribute('aria-checked', String(on));
+    if (card) card.hidden = on;
+    if (fhir) fhir.hidden = !on;
+  });
+</script>
+
+<style>
+  .about {
+    display: grid;
+    gap: var(--space-7);
+    align-items: start;
+  }
+
+  @media (min-width: 60rem) {
+    .about {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--space-8);
+    }
+  }
+
+  .about__text {
+    display: grid;
+    gap: var(--space-4);
+    max-width: var(--measure);
+  }
+
+  .about__text > p:first-child {
+    font-size: var(--step-1);
+  }
+
+  .about__subhead {
+    margin-top: var(--space-4);
+    font-size: var(--step-0);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+
+  .domains {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .domains li {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+  }
+
+  .domains .check {
+    transform: translateY(0.25em);
+  }
+
+  /* ---------- switch ---------- */
+  .profile {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .fhir-switch {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  :global(html:not(.js)) .fhir-switch {
+    display: none;
+  }
+
+  .switch {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 2.75rem;
+    padding: var(--space-1) var(--space-3) var(--space-1) var(--space-2);
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: 700;
+  }
+
+  .switch:hover {
+    border-color: var(--accent);
+  }
+
+  .switch__track {
+    position: relative;
+    width: 2.6rem;
+    height: 1.5rem;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-2);
+    transition: background-color 0.2s;
+  }
+
+  .switch__thumb {
+    position: absolute;
+    top: 50%;
+    left: 0.2rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--ink-2);
+    transform: translateY(-50%);
+    transition: transform 0.2s, background-color 0.2s;
+  }
+
+  .switch[aria-checked='true'] .switch__track {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  .switch[aria-checked='true'] .switch__thumb {
+    background: var(--on-accent);
+    transform: translate(1.05rem, -50%);
+  }
+
+  /* ---------- human view ---------- */
+  .profile-card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+
+  .profile-card__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .profile-card__name {
+    font-size: var(--step-2);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .fields {
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-5);
+  }
+
+  .fields > div {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  @media (min-width: 30rem) {
+    .fields > div {
+      grid-template-columns: 9.5rem 1fr;
+      gap: var(--space-4);
+    }
+  }
+
+  dt {
+    color: var(--ink-2);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding-top: 0.15em;
+  }
+
+  dd {
+    overflow-wrap: anywhere;
+  }
+
+  .fields__list {
+    margin: 0;
+  }
+
+  .fields__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  /* ---------- FHIR view ---------- */
+  .fhir {
+    overflow: hidden;
+    border: 1px solid var(--term-line);
+    border-radius: var(--radius);
+    background: var(--term-bg);
+    color: var(--term-ink);
+    box-shadow: var(--shadow-lg);
+  }
+
+  :global(html:not(.js)) .fhir[hidden] {
+    display: block !important;
+  }
+
+  .fhir__bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-bottom: 1px solid var(--term-line);
+    background: var(--term-bar);
+    color: var(--term-dim);
+    font-size: var(--step--1);
+  }
+
+  .fhir__verb {
+    color: var(--term-accent);
+    font-weight: 700;
+  }
+
+  .fhir__ok {
+    color: var(--term-pass);
+    font-weight: 700;
+  }
+
+  .fhir__code {
+    margin: 0;
+    padding: var(--space-4) var(--space-5);
+    font-size: clamp(0.75rem, 0.7rem + 0.2vw, 0.84rem);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    tab-size: 2;
+  }
+
+  .fhir__code :global(.j-key) {
+    color: var(--term-key);
+  }
+
+  .fhir__code :global(.j-str) {
+    color: var(--term-str);
+  }
+
+  .fhir__code :global(.j-num),
+  .fhir__code :global(.j-lit) {
+    color: var(--term-num);
+  }
+
+  .fhir__code :global(.j-punct) {
+    color: var(--term-dim);
+  }
+
+  .fhir__caption {
+    padding: var(--space-3) var(--space-5);
+    border-top: 1px solid var(--term-line);
+    color: var(--term-dim);
+    font-size: var(--step--1);
+  }
+</style>
