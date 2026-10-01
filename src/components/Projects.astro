@@ -1,0 +1,246 @@
+---
+import Icon from './Icon.astro';
+import SectionHeading from './SectionHeading.astro';
+import TodoMark from './TodoMark.astro';
+import { isTodo, projects } from '../data/profile';
+
+const linkIcon = { Code: 'code', 'Live test report': 'report', 'Demo video': 'play' } as const;
+---
+
+<section id="projects" class="section" aria-labelledby="projects-title">
+  <div class="container">
+    <SectionHeading id="projects" index={4} file="projects.feature" title="Projects">
+      <p>Each project opens the way a good test does: Given, When, Then.</p>
+    </SectionHeading>
+
+    <ul class="projects" role="list">
+      {
+        projects.map((p) => (
+          <li>
+            <article class="project" aria-labelledby={`project-${p.id}-title`} data-testid={`project-${p.id}`}>
+              <header class="project__head">
+                <p class="project__feature mono" aria-hidden="true">
+                  Feature:
+                </p>
+                <h3 id={`project-${p.id}-title`}>{p.title}</h3>
+                {p.tag && <span class="project__tag mono">@{p.tag.toLowerCase()}</span>}
+              </header>
+
+              <dl class="gherkin mono">
+                <div>
+                  <dt>Given</dt>
+                  <dd>
+                    {p.given}
+                    {p.givenTodo && (
+                      <>
+                        {' '}
+                        <TodoMark label={p.givenTodo.todo} />
+                      </>
+                    )}
+                  </dd>
+                </div>
+                <div>
+                  <dt>When</dt>
+                  <dd>{p.when}</dd>
+                </div>
+                <div>
+                  <dt>Then</dt>
+                  <dd>{p.then}</dd>
+                </div>
+              </dl>
+
+              <div class="project__body">
+                <ul class="project__details">
+                  {p.bullets.map((b) => (
+                    <li>{b}</li>
+                  ))}
+                </ul>
+
+                <div class="project__aside">
+                  <h4 class="project__label mono">Tech</h4>
+                  <ul class="chips" role="list">
+                    {p.tech.map((t) => (
+                      <li class="chip">{t}</li>
+                    ))}
+                  </ul>
+
+                  <h4 class="project__label mono">Links</h4>
+                  <ul class="project__links" role="list">
+                    {p.links.map((l) => (
+                      <li>
+                        {isTodo(l.href) ? (
+                          <span class="project__link project__link--todo">
+                            <Icon name={linkIcon[l.label as keyof typeof linkIcon] ?? 'external'} />
+                            {l.label} <TodoMark label={l.href.todo} />
+                          </span>
+                        ) : (
+                          <a class="project__link" href={l.href}>
+                            <Icon name={linkIcon[l.label as keyof typeof linkIcon] ?? 'external'} />
+                            {l.label}
+                            <span class="sr-only">: {p.title}</span>
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </article>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .projects {
+    display: grid;
+    gap: var(--space-7);
+    margin: 0;
+  }
+
+  .project {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+
+  .project__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-3);
+    padding: var(--space-5) var(--space-5) var(--space-4);
+  }
+
+  @media (min-width: 48rem) {
+    .project__head {
+      padding: var(--space-6) var(--space-6) var(--space-4);
+    }
+  }
+
+  .project__feature {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: var(--step-2);
+  }
+
+  .project__tag {
+    margin-left: auto;
+    padding: 0.1rem 0.6rem;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: var(--step--1);
+    font-weight: 700;
+  }
+
+  /* ---------- Given / When / Then ---------- */
+  .gherkin {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0 var(--space-5);
+    padding: var(--space-5);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    background: var(--surface-2);
+    font-size: clamp(0.85rem, 0.82rem + 0.15vw, 0.95rem);
+    line-height: 1.65;
+  }
+
+  @media (min-width: 48rem) {
+    .gherkin {
+      margin-inline: var(--space-6);
+    }
+  }
+
+  .gherkin div {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    gap: var(--space-3);
+  }
+
+  .gherkin dt {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* ---------- details ---------- */
+  .project__body {
+    display: grid;
+    gap: var(--space-6);
+    padding: var(--space-5);
+  }
+
+  @media (min-width: 48rem) {
+    .project__body {
+      padding: var(--space-6);
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .project__body {
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+      gap: var(--space-7);
+    }
+  }
+
+  .project__details {
+    align-content: start;
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+
+  .project__details li::marker {
+    color: var(--accent);
+  }
+
+  .project__aside {
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+  }
+
+  .project__label {
+    margin-top: var(--space-2);
+    color: var(--ink-2);
+    font-size: var(--step--1);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .project__links {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .project__link {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 2.75rem;
+    font-weight: 700;
+  }
+
+  .project__link :global(svg) {
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: none;
+  }
+
+  .project__link--todo {
+    color: var(--ink-2);
+    font-weight: 600;
+  }
+</style>
