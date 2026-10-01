@@ -1,0 +1,361 @@
+---
+import Icon from './Icon.astro';
+import SectionHeading from './SectionHeading.astro';
+import TodoMark from './TodoMark.astro';
+import { isTodo, stages } from '../data/profile';
+
+/** The most recent job is open by default so the details are visible at once. */
+const defaultOpen = 'altera';
+---
+
+<section id="experience" class="section" aria-labelledby="experience-title">
+  <div class="container">
+    <SectionHeading id="experience" index={2} file="career.pipeline.yml" title="Experience">
+      <p>My career as a CI pipeline. Select a stage to open its log.</p>
+    </SectionHeading>
+
+    <div class="run mono" aria-hidden="true">
+      <span class="run__status"><Icon name="check" /> Success</span>
+      <span>{stages.length} stages</span>
+      <span>6+ years</span>
+    </div>
+
+    <div class="pipeline" data-pipeline>
+      {
+        stages.map((stage, i) => {
+          const open = stage.id === defaultOpen;
+          return (
+            <>
+              <button
+                type="button"
+                class="stage"
+                id={`stage-${stage.id}`}
+                aria-expanded={open ? 'true' : 'false'}
+                aria-controls={`stage-${stage.id}-log`}
+                data-stage={stage.id}
+              >
+                <span class="stage__top">
+                  <span class="check">
+                    <Icon name="check" />
+                  </span>
+                  <span class="sr-only">Passed:</span>
+                  <span class="stage__num mono">
+                    stage {i + 1}/{stages.length}
+                  </span>
+                  <Icon name="chevron" class="stage__chevron" />
+                </span>
+                <span class="stage__name">{stage.name}</span>
+                <span class="stage__role">{stage.role}</span>
+                {stage.dates !== null && (
+                  <span class="stage__dates mono">
+                    {isTodo(stage.dates) ? <TodoMark label={stage.dates.todo} /> : stage.dates}
+                  </span>
+                )}
+              </button>
+
+              <div
+                class="log"
+                id={`stage-${stage.id}-log`}
+                role="region"
+                aria-labelledby={`stage-${stage.id}-log-title`}
+                style={`--i:${i}`}
+                hidden={!open}
+                data-stage-log={stage.id}
+              >
+                <h3 id={`stage-${stage.id}-log-title`} class="log__title">
+                  {stage.role}, {stage.name === 'GLI' ? 'Gaming Laboratories International (GLI)' : stage.name}
+                </h3>
+                <p class="log__meta">
+                  {stage.location && <span>{stage.location} · </span>}
+                  {stage.description}
+                </p>
+                <ul class="log__lines" role="list">
+                  {stage.bullets.map((b) => (
+                    <li>{b}</li>
+                  ))}
+                </ul>
+                {stage.id === 'portfolio' && (
+                  <p class="log__more">
+                    <a href="#projects">
+                      See the projects <Icon name="arrowRight" />
+                    </a>
+                  </p>
+                )}
+              </div>
+            </>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-stage]'));
+
+  const logFor = (button: HTMLButtonElement) =>
+    document.getElementById(button.getAttribute('aria-controls') ?? '');
+
+  for (const button of buttons) {
+    button.addEventListener('click', () => {
+      const wasOpen = button.getAttribute('aria-expanded') === 'true';
+      // One log at a time, like selecting a job in a CI run.
+      for (const other of buttons) {
+        other.setAttribute('aria-expanded', 'false');
+        const log = logFor(other);
+        if (log) log.hidden = true;
+      }
+      if (!wasOpen) {
+        button.setAttribute('aria-expanded', 'true');
+        const log = logFor(button);
+        if (log) log.hidden = false;
+      }
+    });
+  }
+</script>
+
+<style>
+  .run {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+    margin-bottom: var(--space-5);
+    color: var(--ink-2);
+    font-size: var(--step--1);
+  }
+
+  .run__status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 0.1rem 0.6rem 0.1rem 0.45rem;
+    border-radius: 999px;
+    background: var(--pass-soft);
+    color: var(--pass);
+    font-weight: 700;
+  }
+
+  .run__status :global(svg) {
+    width: 1rem;
+    height: 1rem;
+    stroke-width: 3;
+  }
+
+  /* ---------- layout: stacked timeline on small screens ---------- */
+  .pipeline {
+    --gap: 2.25rem;
+    position: relative;
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .stage {
+    position: relative;
+    display: grid;
+    gap: var(--space-1);
+    width: 100%;
+    padding: var(--space-4) var(--space-5);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    text-align: left;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .stage:hover {
+    border-color: var(--border);
+  }
+
+  .stage[aria-expanded='true'] {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), var(--shadow);
+  }
+
+  .stage__top {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-1);
+  }
+
+  .stage__num {
+    color: var(--ink-2);
+    font-size: var(--step--1);
+  }
+
+  .stage :global(.stage__chevron) {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-left: auto;
+    color: var(--ink-2);
+    transition: transform 0.2s;
+  }
+
+  .stage[aria-expanded='true'] :global(.stage__chevron) {
+    color: var(--accent);
+    transform: rotate(180deg);
+  }
+
+  .stage__name {
+    font-size: var(--step-1);
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .stage__role {
+    color: var(--ink);
+  }
+
+  .stage__dates {
+    color: var(--ink-2);
+    font-size: var(--step--1);
+  }
+
+  /* connectors between stacked stages */
+  .stage:not([data-stage='portfolio'])::after {
+    content: '';
+    position: absolute;
+    left: calc(var(--space-5) + 0.7em);
+    top: 100%;
+    width: 2px;
+    height: var(--space-3);
+    background: var(--pass);
+  }
+
+  .stage[aria-expanded='true']:not([data-stage='portfolio'])::after {
+    display: none;
+  }
+
+  /* ---------- the log panel ---------- */
+  .log {
+    position: relative;
+    padding: var(--space-5);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface-2);
+  }
+
+  .log__title {
+    font-size: var(--step-1);
+  }
+
+  .log__meta {
+    margin-top: var(--space-2);
+    color: var(--ink-2);
+  }
+
+  .log__lines {
+    display: grid;
+    gap: var(--space-2);
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    counter-reset: line;
+  }
+
+  .log__lines li {
+    position: relative;
+    padding-left: 2.6rem;
+    counter-increment: line;
+  }
+
+  .log__lines li::before {
+    content: counter(line, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 0.15em;
+    color: var(--ink-2);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+  }
+
+  .log__more {
+    margin-top: var(--space-4);
+  }
+
+  .log__more a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 2.75rem;
+    font-weight: 700;
+  }
+
+  .log__more :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  :global(html:not(.js)) .log[hidden] {
+    display: block !important;
+  }
+
+  /* ---------- left-to-right pipeline on wide screens ---------- */
+  @media (min-width: 60rem) {
+    .pipeline {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      column-gap: var(--gap);
+      row-gap: var(--space-5);
+    }
+
+    .stage {
+      grid-row: 1;
+      align-content: start;
+      height: 100%;
+    }
+
+    .stage:not([data-stage='portfolio'])::after,
+    .stage[aria-expanded='true']:not([data-stage='portfolio'])::after {
+      display: block;
+      left: 100%;
+      top: calc(var(--space-4) + 0.7em);
+      width: var(--gap);
+      height: 2px;
+    }
+
+    /* arrowhead */
+    .stage:not([data-stage='portfolio'])::before {
+      content: '';
+      position: absolute;
+      left: calc(100% + var(--gap) - 7px);
+      top: calc(var(--space-4) + 0.7em - 4px);
+      border: 5px solid transparent;
+      border-left: 7px solid var(--pass);
+      border-right: 0;
+    }
+
+    .log {
+      grid-row: 2;
+      grid-column: 1 / -1;
+      padding: var(--space-6);
+    }
+
+    /* little pointer from the panel up to its stage */
+    .log::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: calc((100% - 3 * var(--gap)) / 4 * (var(--i) + 0.5) + var(--gap) * var(--i) - 8px);
+      width: 14px;
+      height: 14px;
+      border-top: 1px solid var(--line);
+      border-left: 1px solid var(--line);
+      background: var(--surface-2);
+      transform: rotate(45deg);
+    }
+
+    .log__lines {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--space-7);
+    }
+
+    :global(html:not(.js)) .log {
+      grid-row: auto;
+    }
+
+    :global(html:not(.js)) .log::before {
+      display: none;
+    }
+  }
+</style>
