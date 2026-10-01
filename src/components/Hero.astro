@@ -1,0 +1,321 @@
+---
+import Icon from './Icon.astro';
+import TodoMark from './TodoMark.astro';
+import { heroSpec, isTodo, person } from '../data/profile';
+
+/*
+ * The "test run" is pure CSS: every line is real text in the HTML, and the
+ * reveal only happens under prefers-reduced-motion: no-preference. No JS means
+ * nothing can get stuck half-way; reduced motion shows the final state.
+ */
+const step = 420; // ms between test lines
+const firstTest = 900;
+const doneAt = firstTest + heroSpec.tests.length * step + 150;
+---
+
+<section class="hero" aria-labelledby="hero-title" style={`--done:${doneAt}ms`}>
+  <div class="container hero__inner">
+    <figure class="terminal" aria-label="Test run: a spec about Lisna Thomas" data-testid="hero-terminal">
+      <div class="terminal__bar">
+        <span class="terminal__status">
+          <span class="terminal__runs" aria-hidden="true">RUNS</span>
+          <span class="terminal__pass" data-testid="hero-status">PASS</span>
+        </span>
+        <span class="terminal__file">lisna.spec.ts</span>
+      </div>
+
+      <div class="terminal__body">
+        <p class="t-line t-cmd" style="--d:0">
+          <span class="t-dim" aria-hidden="true">$</span> npm test
+        </p>
+        <p class="t-line t-reveal" style="--d:400">
+          <span class="t-fn">describe</span><span class="t-dim">(</span><span class="t-str"
+            >'{heroSpec.describe}'</span
+          ><span class="t-dim">)</span>
+        </p>
+        <ul class="t-tests" role="list">
+          {
+            heroSpec.tests.map((name, i) => (
+              <li class="t-line t-test t-reveal" style={`--d:${firstTest + i * step}`}>
+                <span class="t-check">
+                  <Icon name="check" />
+                </span>
+                <span class="sr-only">Passed: </span>
+                <span>{name}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="t-line t-summary t-reveal" style={`--d:${doneAt}`} data-testid="hero-summary">
+          {heroSpec.tests.length} passing
+        </p>
+      </div>
+    </figure>
+
+    <div class="hero__intro">
+      <h1 id="hero-title">{person.name}</h1>
+      <p class="hero__headline">
+        {
+          person.headline.map((part, i) => (
+            <>
+              {i > 0 && (
+                <span class="hero__dot" aria-hidden="true">
+                  ·
+                </span>
+              )}
+              <span>{part}</span>
+            </>
+          ))
+        }
+      </p>
+
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="#projects">
+          <Icon name="arrowDown" /> View projects
+        </a>
+        <a class="btn" href={person.github} rel="me">
+          <Icon name="github" /> GitHub
+        </a>
+        {
+          isTodo(person.resume) ? (
+            <span class="btn btn--todo">
+              <Icon name="download" /> Download resume <TodoMark label={person.resume.todo} />
+            </span>
+          ) : (
+            <a class="btn" href={person.resume} download>
+              <Icon name="download" /> Download resume <span class="sr-only">(PDF)</span>
+            </a>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    padding-block: var(--space-7) var(--space-8);
+    overflow: hidden;
+  }
+
+  /* Faint chart-paper grid, the kind you see behind an ECG trace. */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-position: -1px -1px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 30%, transparent 75%);
+    opacity: 0.7;
+  }
+
+  @media (min-width: 48rem) {
+    .hero {
+      padding-block: var(--space-8) var(--space-9);
+    }
+  }
+
+  .hero__inner {
+    display: grid;
+    gap: var(--space-7);
+    max-width: 52rem;
+  }
+
+  /* ---------- terminal ---------- */
+  .terminal {
+    overflow: hidden;
+    border: 1px solid var(--term-line);
+    border-radius: var(--radius);
+    background: var(--term-bg);
+    color: var(--term-ink);
+    box-shadow: var(--shadow-lg);
+    font-family: var(--font-mono);
+    font-size: clamp(0.85rem, 0.8rem + 0.3vw, 1rem);
+    line-height: 1.7;
+  }
+
+  .terminal__bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-4);
+    border-bottom: 1px solid var(--term-line);
+    background: var(--term-bar);
+    color: var(--term-dim);
+    font-size: 0.85em;
+  }
+
+  .terminal__status {
+    display: inline-grid;
+  }
+
+  .terminal__runs,
+  .terminal__pass {
+    grid-area: 1 / 1;
+    padding: 0 0.5em;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-align: center;
+  }
+
+  .terminal__runs {
+    display: none;
+    background: var(--term-str);
+    color: var(--term-bg);
+  }
+
+  .terminal__pass {
+    background: var(--term-pass);
+    color: var(--term-bg);
+  }
+
+  .terminal__body {
+    padding: var(--space-4) var(--space-4) var(--space-5);
+    overflow-wrap: anywhere;
+  }
+
+  @media (min-width: 40rem) {
+    .terminal__body {
+      padding: var(--space-5) var(--space-6) var(--space-6);
+    }
+  }
+
+  .t-tests {
+    margin: 0;
+    padding-left: 1.25em;
+  }
+
+  .t-test {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6em;
+  }
+
+  .t-check {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 1.15em;
+    height: 1.15em;
+    color: var(--term-pass);
+    transform: translateY(0.18em);
+  }
+
+  .t-check :global(svg) {
+    width: 100%;
+    height: 100%;
+    stroke-width: 3;
+  }
+
+  .t-dim {
+    color: var(--term-dim);
+  }
+
+  .t-fn {
+    color: var(--term-key);
+  }
+
+  .t-str {
+    color: var(--term-str);
+  }
+
+  .t-summary {
+    margin-top: var(--space-3);
+    color: var(--term-pass);
+    font-weight: 700;
+  }
+
+  /* ---------- the run (only when motion is welcome) ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .t-reveal {
+      animation: t-in 0.32s ease-out both;
+      animation-delay: calc(var(--d) * 1ms);
+    }
+
+    .t-test .t-check {
+      animation: t-pop 0.36s cubic-bezier(0.3, 1.6, 0.6, 1) both;
+      animation-delay: calc(var(--d) * 1ms + 140ms);
+    }
+
+    .terminal__runs {
+      display: block;
+      animation: t-out 0.2s ease-out both;
+      animation-delay: var(--done);
+    }
+
+    .terminal__pass {
+      animation: t-in 0.25s ease-out both;
+      animation-delay: var(--done);
+    }
+  }
+
+  @keyframes t-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+  }
+
+  @keyframes t-out {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes t-pop {
+    from {
+      opacity: 0;
+      transform: translateY(0.18em) scale(0.3);
+    }
+  }
+
+  /* ---------- intro ---------- */
+  .hero__intro {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  h1 {
+    font-size: var(--step-4);
+    letter-spacing: -0.025em;
+  }
+
+  .hero__headline {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.6em;
+    color: var(--ink-2);
+    font-size: var(--step-1);
+    font-weight: 600;
+  }
+
+  .hero__dot {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+  }
+
+  .btn--todo {
+    border-style: dashed;
+    color: var(--ink-2);
+    cursor: default;
+  }
+
+  .btn--todo:hover {
+    border-color: var(--border);
+    color: var(--ink-2);
+  }
+</style>

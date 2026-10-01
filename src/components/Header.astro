@@ -177,8 +177,8 @@ import { nav, person } from '../data/profile';
     color: var(--accent);
   }
 
-  .menu-button svg,
-  .theme-toggle svg {
+  .menu-button :global(svg),
+  .theme-toggle :global(svg) {
     width: 1.25rem;
     height: 1.25rem;
   }
@@ -188,15 +188,15 @@ import { nav, person } from '../data/profile';
   }
 
   /* Show the icon of the theme you would switch TO. */
-  .theme-toggle__sun {
+  .theme-toggle :global(.theme-toggle__sun) {
     display: none;
   }
 
-  .theme-toggle[aria-pressed='true'] .theme-toggle__sun {
+  .theme-toggle[aria-pressed='true'] :global(.theme-toggle__sun) {
     display: block;
   }
 
-  .theme-toggle[aria-pressed='true'] .theme-toggle__moon {
+  .theme-toggle[aria-pressed='true'] :global(.theme-toggle__moon) {
     display: none;
   }
 
@@ -204,15 +204,15 @@ import { nav, person } from '../data/profile';
     display: none;
   }
 
-  .menu-button__close {
+  .menu-button :global(.menu-button__close) {
     display: none;
   }
 
-  .menu-button[aria-expanded='true'] .menu-button__open {
+  .menu-button[aria-expanded='true'] :global(.menu-button__open) {
     display: none;
   }
 
-  .menu-button[aria-expanded='true'] .menu-button__close {
+  .menu-button[aria-expanded='true'] :global(.menu-button__close) {
     display: block;
   }
 
