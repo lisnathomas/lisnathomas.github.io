@@ -1,0 +1,73 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import { skillGroups } from '../data/profile';
+---
+
+<section id="skills" class="section" aria-labelledby="skills-title">
+  <div class="container">
+    <SectionHeading id="skills" index={6} file="skills.json" title="Skills" />
+
+    <div class="groups">
+      {
+        skillGroups.map((g, i) => (
+          <section class:list={['group', { 'group--lead': i === 0 }]} aria-labelledby={`skills-${i}`}>
+            <h3 id={`skills-${i}`}>{g.name}</h3>
+            <ul class="chips" role="list">
+              {g.items.map((s) => (
+                <li class="chip">{s}</li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .groups {
+    display: grid;
+    gap: var(--space-6) var(--space-7);
+  }
+
+  @media (min-width: 48rem) {
+    .groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .group {
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+  }
+
+  h3 {
+    font-size: var(--step-0);
+    font-family: var(--font-mono);
+    color: var(--ink-2);
+  }
+
+  /* Healthcare comes first and gets the accent. */
+  .group--lead {
+    padding: var(--space-5);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    background: var(--accent-soft);
+  }
+
+  @media (min-width: 48rem) {
+    .group--lead {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .group--lead h3 {
+    color: var(--accent);
+  }
+
+  .group--lead .chip {
+    border-color: var(--accent);
+    background: var(--surface);
+  }
+</style>
