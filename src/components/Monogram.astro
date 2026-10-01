@@ -1,0 +1,45 @@
+---
+/** The "LT" monogram used instead of a photo. Decorative unless a label is given. */
+interface Props {
+  size?: 'sm' | 'lg';
+  label?: string;
+}
+
+const { size = 'sm', label } = Astro.props;
+---
+
+<span
+  class:list={['monogram', `monogram--${size}`]}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}>LT</span
+>
+
+<style>
+  .monogram {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    border: 2px solid var(--accent);
+    border-radius: 28%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .monogram--sm {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.95rem;
+  }
+
+  .monogram--lg {
+    width: 4.5rem;
+    height: 4.5rem;
+    font-size: 1.75rem;
+    border-width: 2.5px;
+  }
+</style>

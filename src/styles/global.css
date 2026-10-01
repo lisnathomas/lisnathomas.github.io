@@ -1,0 +1,241 @@
+/*
+ * Design tokens.
+ * Every text/background pair below was checked against WCAG 2.2 AA (4.5:1 for
+ * text, 3:1 for UI boundaries) in both themes. The terminal palette is shared
+ * by both themes so code panels always read as "a real terminal".
+ */
+:root {
+  color-scheme: light dark;
+
+  --bg: light-dark(#f8f7f3, #0b1521);
+  --surface: light-dark(#ffffff, #101d2c);
+  --surface-2: light-dark(#efeee8, #16263a);
+  --ink: light-dark(#0f1e33, #e8edf3);
+  --ink-2: light-dark(#475569, #a7b4c4);
+  --line: light-dark(#e1dfd7, #1f3247);
+  --border: light-dark(#7a8494, #5e7088);
+  --accent: light-dark(#0a6b66, #5ed3c6);
+  --accent-soft: light-dark(#e0f0ee, #12333a);
+  --on-accent: light-dark(#ffffff, #0b1521);
+  --pass: light-dark(#17703a, #5bd37a);
+  --pass-soft: light-dark(#e3f2e8, #12301f);
+  --todo: light-dark(#8a4b00, #f2b66d);
+  --todo-soft: light-dark(#fbf0e1, #2e2213);
+  --shadow: light-dark(0 1px 2px rgb(15 30 51 / 6%), 0 1px 2px rgb(0 0 0 / 30%));
+  --shadow-lg: light-dark(0 12px 32px -12px rgb(15 30 51 / 22%), 0 12px 32px -12px rgb(0 0 0 / 60%));
+
+  --term-bg: #0a1420;
+  --term-bar: #111f30;
+  --term-line: #1f3247;
+  --term-ink: #dce4ee;
+  --term-dim: #93a3b8;
+  --term-pass: #5bd37a;
+  --term-accent: #5ed3c6;
+  --term-str: #f2c77d;
+  --term-key: #8ec9ff;
+  --term-num: #f59ebf;
+
+  --font-sans: 'Atkinson Hyperlegible Next', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Atkinson Hyperlegible Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: clamp(1.45rem, 1.2rem + 1vw, 1.75rem);
+  --step-3: clamp(1.9rem, 1.4rem + 2vw, 2.6rem);
+  --step-4: clamp(2.6rem, 1.8rem + 3.6vw, 4.25rem);
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --space-9: 7rem;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --measure: 66ch;
+  --page: 72rem;
+  --header-h: 4rem;
+}
+
+:root[data-theme='light'] { color-scheme: light; }
+:root[data-theme='dark'] { color-scheme: dark; }
+
+/* ---------- reset ---------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + var(--space-4));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, p, ul, ol, dl, dd, figure, pre { margin: 0; }
+ul[role='list'], ol[role='list'] { list-style: none; padding: 0; }
+img, svg { display: block; max-width: 100%; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+
+h1, h2, h3 { line-height: 1.15; font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; }
+p, li, dd { text-wrap: pretty; }
+
+a { color: var(--accent); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+
+code, kbd, pre, .mono { font-family: var(--font-mono); font-size: 0.92em; }
+
+::selection { background: var(--accent); color: var(--on-accent); }
+
+/* Visible focus for every interactive element (WCAG 2.4.7 / 2.4.11). */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------- utilities ---------- */
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.container {
+  width: min(100% - 2 * var(--gutter), var(--page));
+  margin-inline: auto;
+}
+
+.section {
+  padding-block: var(--space-8);
+  border-top: 1px solid var(--line);
+}
+
+@media (min-width: 48rem) {
+  .section { padding-block: var(--space-9); }
+}
+
+.lead { font-size: var(--step-1); color: var(--ink-2); max-width: var(--measure); }
+.muted { color: var(--ink-2); }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 2.75rem;
+  padding: 0.6rem 1.15rem;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn svg { width: 1.1em; height: 1.1em; flex: none; }
+
+.btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.btn--primary:hover { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  list-style: none;
+  padding: 0;
+}
+
+.chip {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  line-height: 1.5;
+}
+
+/* ---------- placeholders that still need real content ---------- */
+.todo {
+  display: inline-block;
+  padding: 0 0.4em;
+  border: 1.5px dashed var(--todo);
+  border-radius: var(--radius-sm);
+  background: var(--todo-soft);
+  color: var(--todo);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+/* ---------- pass marker ---------- */
+.check {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 1.4em;
+  height: 1.4em;
+  border-radius: 50%;
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+
+.check svg { width: 0.85em; height: 0.85em; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  .site-header, .skip-link, .theme-toggle, .fhir-switch { display: none !important; }
+  .section { padding-block: var(--space-6); break-inside: avoid; }
+}

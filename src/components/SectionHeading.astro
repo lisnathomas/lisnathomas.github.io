@@ -1,0 +1,63 @@
+---
+/**
+ * Section heading with a small monospace "file name" label above it,
+ * so every section reads like a file in a test project.
+ */
+interface Props {
+  id: string;
+  index: number;
+  file: string;
+  title: string;
+}
+
+const { id, index, file, title } = Astro.props;
+---
+
+<div class="section-heading">
+  <p class="section-heading__file mono" aria-hidden="true">
+    <span class="section-heading__index">{String(index).padStart(2, '0')}</span>
+    {file}
+  </p>
+  <h2 id={`${id}-title`}>{title}</h2>
+  <slot />
+</div>
+
+<style>
+  .section-heading {
+    display: grid;
+    gap: var(--space-3);
+    margin-bottom: var(--space-7);
+  }
+
+  .section-heading__file {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--ink-2);
+    font-size: var(--step--1);
+    letter-spacing: 0.02em;
+  }
+
+  .section-heading__file::after {
+    content: '';
+    flex: 1;
+    max-width: 12rem;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .section-heading__index {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  h2 {
+    font-size: var(--step-3);
+  }
+
+  .section-heading :global(p:not(.section-heading__file)) {
+    max-width: var(--measure);
+    color: var(--ink-2);
+    font-size: var(--step-1);
+  }
+</style>

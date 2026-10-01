@@ -1,0 +1,263 @@
+---
+import Icon from './Icon.astro';
+import Monogram from './Monogram.astro';
+import { nav, person } from '../data/profile';
+---
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="brand" href="#top" aria-label={`${person.name}, back to top`}>
+      <Monogram />
+      <span class="brand__name" aria-hidden="true">{person.name}</span>
+    </a>
+
+    <nav class="site-nav" aria-label="Primary">
+      <button
+        class="menu-button"
+        type="button"
+        aria-expanded="false"
+        aria-controls="nav-list"
+        data-menu-button
+      >
+        <Icon name="menu" class="menu-button__open" />
+        <Icon name="close" class="menu-button__close" />
+        <span>Menu</span>
+      </button>
+      <ul id="nav-list" class="nav-list" role="list" data-nav-list>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={`#${item.id}`}>{item.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <button class="theme-toggle" type="button" aria-pressed="false" data-theme-toggle>
+      <Icon name="moon" class="theme-toggle__moon" />
+      <Icon name="sun" class="theme-toggle__sun" />
+      <span class="sr-only">Dark theme</span>
+    </button>
+  </div>
+</header>
+
+<script>
+  // ---- Theme toggle: system preference by default, explicit choice wins. ----
+  const root = document.documentElement;
+  const toggle = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+  const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+  const currentTheme = (): 'light' | 'dark' => {
+    const explicit = root.dataset['theme'];
+    if (explicit === 'light' || explicit === 'dark') return explicit;
+    return systemDark.matches ? 'dark' : 'light';
+  };
+
+  const syncToggle = () => toggle?.setAttribute('aria-pressed', String(currentTheme() === 'dark'));
+
+  toggle?.addEventListener('click', () => {
+    const next = currentTheme() === 'dark' ? 'light' : 'dark';
+    root.dataset['theme'] = next;
+    try {
+      localStorage.setItem('theme', next);
+    } catch {
+      /* storage blocked: the choice simply lasts for this page view */
+    }
+    syncToggle();
+  });
+  systemDark.addEventListener('change', syncToggle);
+  syncToggle();
+
+  // ---- Mobile menu ----
+  const menuButton = document.querySelector<HTMLButtonElement>('[data-menu-button]');
+  const navList = document.querySelector<HTMLElement>('[data-nav-list]');
+
+  const setMenu = (open: boolean) => menuButton?.setAttribute('aria-expanded', String(open));
+  const isOpen = () => menuButton?.getAttribute('aria-expanded') === 'true';
+
+  menuButton?.addEventListener('click', () => setMenu(!isOpen()));
+  navList?.addEventListener('click', (event) => {
+    if ((event.target as Element).closest('a')) setMenu(false);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && isOpen()) {
+      setMenu(false);
+      menuButton?.focus();
+    }
+  });
+  document.addEventListener('click', (event) => {
+    if (isOpen() && !(event.target as Element).closest('.site-nav')) setMenu(false);
+  });
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--line);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+  }
+
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: var(--header-h);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-right: auto;
+    color: var(--ink);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .brand__name {
+    display: none;
+  }
+
+  @media (min-width: 30rem) {
+    .brand__name {
+      display: inline;
+    }
+  }
+
+  .site-nav {
+    position: relative;
+  }
+
+  .nav-list {
+    display: flex;
+    gap: var(--space-1);
+    margin: 0;
+  }
+
+  .nav-list a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding: 0 var(--space-3);
+    border-radius: 999px;
+    color: var(--ink-2);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .nav-list a:hover {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+
+  .menu-button,
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0 var(--space-3);
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .menu-button:hover,
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .menu-button svg,
+  .theme-toggle svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .theme-toggle {
+    padding: 0;
+  }
+
+  /* Show the icon of the theme you would switch TO. */
+  .theme-toggle__sun {
+    display: none;
+  }
+
+  .theme-toggle[aria-pressed='true'] .theme-toggle__sun {
+    display: block;
+  }
+
+  .theme-toggle[aria-pressed='true'] .theme-toggle__moon {
+    display: none;
+  }
+
+  .menu-button {
+    display: none;
+  }
+
+  .menu-button__close {
+    display: none;
+  }
+
+  .menu-button[aria-expanded='true'] .menu-button__open {
+    display: none;
+  }
+
+  .menu-button[aria-expanded='true'] .menu-button__close {
+    display: block;
+  }
+
+  /* Without JavaScript the toggles cannot work, so hide them; the nav just wraps. */
+  :global(html:not(.js)) .theme-toggle,
+  :global(html:not(.js)) .menu-button {
+    display: none;
+  }
+
+  @media (max-width: 63.99rem) {
+    :global(html.js) .menu-button {
+      display: inline-flex;
+    }
+
+    :global(html.js) .nav-list {
+      position: absolute;
+      top: calc(100% + var(--space-3));
+      right: 0;
+      flex-direction: column;
+      min-width: 14rem;
+      padding: var(--space-2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow-lg);
+    }
+
+    :global(html.js) .menu-button[aria-expanded='false'] + .nav-list {
+      display: none;
+    }
+
+    :global(html.js) .nav-list a {
+      display: flex;
+      min-height: 2.75rem;
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+    }
+
+    :global(html:not(.js)) .site-header__inner {
+      flex-wrap: wrap;
+      padding-block: var(--space-2);
+    }
+
+    :global(html:not(.js)) .nav-list {
+      flex-wrap: wrap;
+    }
+  }
+</style>

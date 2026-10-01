@@ -1,0 +1,95 @@
+---
+import Icon from './Icon.astro';
+import { person } from '../data/profile';
+
+/*
+ * In GitHub Actions the build knows which workflow run is testing it, so the
+ * badge links to the exact run that verified the version you are looking at.
+ * Local builds fall back to the workflow's run history.
+ */
+const env = process.env;
+const server = env['GITHUB_SERVER_URL'] ?? 'https://github.com';
+const repository = env['GITHUB_REPOSITORY'] ?? 'lisnathomas/lisnathomas.github.io';
+const runId = env['GITHUB_RUN_ID'];
+const sha = env['GITHUB_SHA']?.slice(0, 7);
+const runUrl = runId
+  ? `${server}/${repository}/actions/runs/${runId}`
+  : `${server}/${repository}/actions/workflows/ci.yml`;
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <a class="tested-badge" href={runUrl} data-tested-badge>
+      <span class="tested-badge__status"><Icon name="check" /> passing</span>
+      <span class="tested-badge__label">
+        This site is tested: Playwright · axe · Lighthouse
+      </span>
+      <span class="sr-only">(view the GitHub Actions run)</span>
+    </a>
+
+    <p class="site-footer__meta mono">
+      {sha ? <>build {sha} · </> : null}No cookies, no analytics, no tracking.
+    </p>
+
+    <p class="site-footer__meta">
+      © {year} {person.name} · <a href={person.siteRepo}>Source on GitHub</a>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--line);
+    padding-block: var(--space-7);
+    background: var(--surface);
+  }
+
+  .site-footer__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .tested-badge {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    overflow: hidden;
+    border: 1.5px solid var(--pass);
+    border-radius: var(--radius-sm);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    text-decoration: none;
+  }
+
+  .tested-badge:hover .tested-badge__label {
+    text-decoration: underline;
+  }
+
+  .tested-badge__status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+    background: var(--pass);
+    color: var(--surface);
+    font-weight: 700;
+  }
+
+  .tested-badge__status svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .tested-badge__label {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .site-footer__meta {
+    color: var(--ink-2);
+    font-size: var(--step--1);
+  }
+</style>

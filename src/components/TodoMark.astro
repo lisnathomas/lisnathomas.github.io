@@ -1,0 +1,11 @@
+---
+/** Renders a missing fact as a clearly marked, non-interactive placeholder. */
+interface Props {
+  label: string;
+  class?: string;
+}
+
+const { label, class: className } = Astro.props;
+---
+
+<span class:list={['todo', className]} data-todo={label}>[TODO: {label}]</span>
