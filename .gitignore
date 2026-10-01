@@ -1,0 +1,32 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# test output
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+.lighthouseci/
+
+# logs
+npm-debug.log*
+
+# environment
+.env
+.env.*
+
+# editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# local AI tooling (not part of the site)
+.agents/
+.claude/
+skills-lock.json

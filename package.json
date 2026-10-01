@@ -1,0 +1,37 @@
+{
+  "name": "lisnathomas.github.io",
+  "description": "Portfolio of Lisna Thomas, QA Engineer with a healthcare focus. Built with Astro, tested with Playwright, axe and Lighthouse.",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview --port 4321",
+    "check": "astro check",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report",
+    "lhci": "lhci autorun",
+    "og": "node scripts/render-images.mjs",
+    "todo": "node scripts/list-todos.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/atkinson-hyperlegible-mono": "^5.3.0",
+    "@fontsource-variable/atkinson-hyperlegible-next": "^5.3.0",
+    "astro": "^7.3.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@axe-core/playwright": "^4.13.0",
+    "@lhci/cli": "^0.15.1",
+    "@playwright/test": "^1.63.0",
+    "@types/fhir": "^0.0.44",
+    "@types/node": "^24.19.1",
+    "typescript": "^6.0.3"
+  }
+}
