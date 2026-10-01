@@ -1,0 +1,96 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import Monogram from '../components/Monogram.astro';
+---
+
+<Base title="Page not found · Lisna Thomas" description="This page does not exist." noindex>
+  <main id="main" class="nf container" tabindex="-1">
+    <a class="nf__home" href="/" aria-label="Lisna Thomas, home"><Monogram /></a>
+
+    <figure class="nf__term" aria-label="A failing test: the page you asked for does not exist">
+      <div class="nf__bar"><span class="nf__fail">FAIL</span> routes.spec.ts</div>
+      <div class="nf__body">
+        <p><span class="nf__x" aria-hidden="true">✕</span> page exists</p>
+        <p class="nf__dim">expect(response.status).toBe(200)</p>
+        <p>Expected: <span class="nf__ok">200</span></p>
+        <p>Received: <span class="nf__bad">404</span></p>
+      </div>
+    </figure>
+
+    <h1>Page not found</h1>
+    <p class="lead">That one's a real defect, and it's not on you. The page you asked for doesn't exist.</p>
+    <p>
+      <a class="btn btn--primary" href="/"><Icon name="arrowRight" /> Back to the homepage</a>
+    </p>
+  </main>
+</Base>
+
+<style>
+  .nf {
+    display: grid;
+    gap: var(--space-5);
+    max-width: 44rem;
+    padding-block: var(--space-7) var(--space-9);
+  }
+
+  .nf__home {
+    justify-self: start;
+    border-radius: 28%;
+  }
+
+  .nf__term {
+    overflow: hidden;
+    border: 1px solid var(--term-line);
+    border-radius: var(--radius);
+    background: var(--term-bg);
+    color: var(--term-ink);
+    font-family: var(--font-mono);
+    line-height: 1.7;
+  }
+
+  .nf__bar {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    padding: var(--space-2) var(--space-4);
+    border-bottom: 1px solid var(--term-line);
+    background: var(--term-bar);
+    color: var(--term-dim);
+    font-size: 0.85em;
+  }
+
+  .nf__fail {
+    padding: 0 0.5em;
+    border-radius: 4px;
+    background: #ff9b9b;
+    color: var(--term-bg);
+    font-weight: 700;
+  }
+
+  .nf__body {
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .nf__body p + p {
+    padding-left: 1.6em;
+  }
+
+  .nf__x,
+  .nf__bad {
+    color: #ff9b9b;
+    font-weight: 700;
+  }
+
+  .nf__ok {
+    color: var(--term-pass);
+  }
+
+  .nf__dim {
+    color: var(--term-dim);
+  }
+
+  h1 {
+    font-size: var(--step-3);
+  }
+</style>
