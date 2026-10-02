@@ -83,21 +83,35 @@ test.describe('Every section renders', () => {
   });
 
   test('no phone number appears anywhere on the page', async ({ page }) => {
-    await expect(page.locator('a[href^="tel:"], a[href^="sms:"]')).toHaveCount(0);
+    // No links that dial, text or message a number.
+    await expect(page.locator('a[href^="tel:"], a[href^="sms:"], a[href*="wa.me/"], a[href*="whatsapp"]')).toHaveCount(0);
+
     // Everything a person or a crawler can read: visible text (including the
-    // FHIR JSON), link targets, meta tags and structured data.
+    // FHIR JSON), meta tags and structured data.
     const readable = await page.evaluate(() =>
       [
         document.body.textContent ?? '',
-        ...Array.from(document.querySelectorAll('a[href]'), (a) => a.getAttribute('href') ?? ''),
         ...Array.from(document.querySelectorAll('meta[content]'), (m) => m.getAttribute('content') ?? ''),
         ...Array.from(document.querySelectorAll('script[type="application/ld+json"]'), (s) => s.textContent ?? ''),
       ].join('\n'),
     );
+    // URLs legitimately carry long IDs (an Actions run ID, a LinkedIn profile
+    // ID), so they are removed before looking for phone-like numbers.
+    const withoutUrls = readable.replace(/\b(?:https?|mailto):[^\s"'<>]+/g, ' ');
     // Any run of 10+ digits (allowing spaces, dots, dashes, brackets) looks like a phone number.
-    const candidates = readable.match(/\+?\(?\d[\d\s().-]{8,}\d/g) ?? [];
+    const candidates = withoutUrls.match(/\+?\(?\d[\d\s().-]{8,}\d/g) ?? [];
     const phoneLike = candidates.filter((c) => c.replace(/\D/g, '').length >= 10);
-    expect(phoneLike, 'phone-like numbers in the HTML').toEqual([]);
+    expect(phoneLike, 'phone-like numbers on the page').toEqual([]);
+
+    // The FHIR resource has no phone contact point either.
+    expect(readable).not.toMatch(/"system":\s*"(phone|sms|fax)"/);
+  });
+
+  test('the phone check really catches a phone number (the test is tested)', async ({ page }) => {
+    await page.evaluate(() => document.body.insertAdjacentHTML('beforeend', '<p>Call 604 555 0199 any time</p>'));
+    const text = await page.evaluate(() => document.body.textContent ?? '');
+    const phoneLike = (text.match(/\+?\(?\d[\d\s().-]{8,}\d/g) ?? []).filter((c) => c.replace(/\D/g, '').length >= 10);
+    expect(phoneLike.map((c) => c.trim())).toContain('604 555 0199');
   });
 
   test('every [TODO] placeholder is clearly marked and never a link', async ({ page }, testInfo) => {
