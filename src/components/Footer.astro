@@ -20,12 +20,12 @@ const year = new Date().getFullYear();
 
 <footer class="site-footer">
   <div class="container site-footer__inner">
-    <a class="tested-badge" href={runUrl} data-tested-badge>
+    <a class="tested-badge" href={runUrl} target="_blank" rel="noopener" data-tested-badge>
       <span class="tested-badge__status"><Icon name="check" /> passing</span>
       <span class="tested-badge__label">
         This site is tested: Playwright · axe · Lighthouse
       </span>
-      <span class="sr-only">(view the GitHub Actions run)</span>
+      <span class="sr-only">(view the GitHub Actions run, opens in a new tab)</span>
     </a>
 
     <p class="site-footer__meta mono">
@@ -33,7 +33,10 @@ const year = new Date().getFullYear();
     </p>
 
     <p class="site-footer__meta">
-      © {year} {person.name} · <a href={person.siteRepo}>Source on GitHub</a>
+      © {year} {person.name} ·{' '}
+      <a href={person.siteRepo} target="_blank" rel="noopener">
+        Source on GitHub<span class="sr-only"> (opens in a new tab)</span>
+      </a>
     </p>
   </div>
 </footer>

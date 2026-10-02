@@ -1,15 +1,12 @@
 ---
 import SectionHeading from './SectionHeading.astro';
-import { aiPrinciples } from '../data/profile';
+import { aiIntro, aiPrinciples } from '../data/profile';
 ---
 
 <section id="ai" class="section" aria-labelledby="ai-title">
   <div class="container">
     <SectionHeading id="ai" index={5} file="ai-guardrails.ts" title="How I use AI in testing">
-      <p>
-        I was part of the AI Champions group bringing AI into QA at Altera Digital Health. AI helps me test
-        faster. These four rules keep it honest.
-      </p>
+      <p>{aiIntro}</p>
     </SectionHeading>
 
     <ol class="principles" role="list">

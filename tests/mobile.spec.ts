@@ -22,6 +22,32 @@ test.describe('Mobile and small screens', () => {
     });
   }
 
+  test('hero test lines wrap between words and stay inside the terminal', async ({ page }) => {
+    for (const width of WIDTHS) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto('/');
+      const problems = await page.locator('.t-test > span:last-child').evaluateAll((spans) => {
+        const terminal = document.querySelector('.terminal__body')!.getBoundingClientRect();
+        const found: string[] = [];
+        for (const span of spans) {
+          const text = span.firstChild as Text;
+          let start = 0;
+          for (const word of text.data.split(' ')) {
+            const range = document.createRange();
+            range.setStart(text, start);
+            range.setEnd(text, start + word.length);
+            const rects = Array.from(range.getClientRects());
+            if (rects.length > 1) found.push(`"${word}" is split across lines`);
+            if (rects.some((r) => r.right > terminal.right + 0.5)) found.push(`"${word}" sticks out of the terminal`);
+            start += word.length + 1;
+          }
+        }
+        return found;
+      });
+      expect(problems, `at ${width}px`).toEqual([]);
+    }
+  });
+
   test('pipeline stacks vertically and still opens on tap', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/#experience');

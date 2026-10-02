@@ -1,6 +1,6 @@
 import type { ContactPoint, Practitioner } from 'fhir/r4';
 import { formatJson } from '../lib/format-json';
-import { about, isTodo, person } from './profile';
+import { education, isTodo, person } from './profile';
 
 /**
  * Lisna's profile as a FHIR R4 Practitioner resource.
@@ -29,7 +29,12 @@ export const practitioner: Practitioner = {
     },
   ],
   telecom,
-  qualification: about.qualifications.map((text) => ({ code: { text } })),
+  // Degrees are the qualifications FHIR R4 has in mind: "training, licenses or certification".
+  qualification: education.map((e) => ({
+    code: { text: e.degree },
+    period: { start: e.start, end: e.end },
+    issuer: { display: e.school },
+  })),
 };
 
 export const practitionerJson = formatJson(practitioner);

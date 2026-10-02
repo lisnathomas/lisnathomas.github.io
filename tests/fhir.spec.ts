@@ -52,9 +52,28 @@ test.describe('View as FHIR', () => {
     expect(resource['telecom']).toContainEqual({ system: 'email', value: EMAIL });
     expect(resource['telecom'].some((t: { system: string }) => t.system === 'phone')).toBe(false);
 
-    const qualifications = resource['qualification'].map((q: { code: { text: string } }) => q.code.text);
-    expect(qualifications.join(' ')).toMatch(/QA Engineering/);
-    expect(qualifications.join(' ')).toMatch(/Interoperability/);
+    // Education from the resume, as FHIR qualifications.
+    expect(resource['qualification']).toEqual([
+      {
+        code: { text: 'Bachelor of Computer Information Systems' },
+        period: { start: '2018-09', end: '2020-04' },
+        issuer: { display: 'University of the Fraser Valley' },
+      },
+      {
+        code: { text: "Bachelor's degree in Computer Science" },
+        period: { start: '2015', end: '2018' },
+        issuer: { display: 'Mahatma Gandhi University' },
+      },
+    ]);
+  });
+
+  test('the profile card shows the same education as the FHIR resource', async ({ page }) => {
+    const education = page.getByTestId('education').getByRole('listitem');
+    await expect(education).toHaveCount(2);
+    await expect(education.nth(0)).toContainText('Bachelor of Computer Information Systems');
+    await expect(education.nth(0)).toContainText('University of the Fraser Valley, Abbotsford, BC · September 2018 – April 2020');
+    await expect(education.nth(1)).toContainText("Bachelor's degree in Computer Science");
+    await expect(education.nth(1)).toContainText('Mahatma Gandhi University, Kerala, India · 2015 – 2018');
   });
 
   test('syntax highlighting does not change the JSON text', async ({ page }) => {

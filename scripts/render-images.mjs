@@ -27,8 +27,8 @@ const check = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" strok
 const tests = [
   'has 6+ years of QA experience',
   'speaks HL7 and FHIR',
-  'automates with C#, Java, Playwright, Selenium and Reqnroll',
-  'uses AI to test faster, and verifies every result',
+  'automates with Playwright, Selenium, Appium and Reqnroll',
+  'uses AI agents to test faster, and validates their output',
 ];
 
 const og = `<!doctype html><html><head><style>${base}

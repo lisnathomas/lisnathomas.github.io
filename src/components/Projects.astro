@@ -31,10 +31,12 @@ const linkIcon = { Code: 'code', 'Live test report': 'report', 'Demo video': 'pl
                   <dt>Given</dt>
                   <dd>
                     {p.given}
-                    {p.givenTodo && (
+                    {p.givenCredit && (
                       <>
                         {' '}
-                        <TodoMark label={p.givenTodo.todo} />
+                        <a href={p.givenCredit.href} target="_blank" rel="noopener">
+                          {p.givenCredit.name}<span class="sr-only"> (opens in a new tab)</span>
+                        </a>
                       </>
                     )}
                   </dd>
@@ -74,10 +76,10 @@ const linkIcon = { Code: 'code', 'Live test report': 'report', 'Demo video': 'pl
                             {l.label} <TodoMark label={l.href.todo} />
                           </span>
                         ) : (
-                          <a class="project__link" href={l.href}>
+                          <a class="project__link" href={l.href} target="_blank" rel="noopener">
                             <Icon name={linkIcon[l.label as keyof typeof linkIcon] ?? 'external'} />
                             {l.label}
-                            <span class="sr-only">: {p.title}</span>
+                            <span class="sr-only">: {p.title} (opens in a new tab)</span>
                           </a>
                         )}
                       </li>

@@ -21,18 +21,30 @@ test.describe('Career pipeline', () => {
     }
   });
 
-  test('each stage shows its role and dates', async ({ page }) => {
-    await expect(page.locator('#stage-concentrix')).toContainText('QA Analyst');
-    await expect(page.locator('#stage-concentrix')).toContainText('June 2020 – July 2021');
-    await expect(page.locator('#stage-gli')).toContainText('Test Engineer');
-    await expect(page.locator('#stage-gli')).toContainText('July 2021 – October 2022');
-    await expect(page.locator('#stage-altera')).toContainText('QA Engineer');
+  test('each job shows the title, company, location and dates from the resume', async ({ page }) => {
+    const jobs = [
+      { id: 'concentrix', title: 'QA Analyst, Concentrix', location: 'Chilliwack, BC', dates: 'August 2020 – October 2022', bullets: 6 },
+      { id: 'gli', title: 'Test Engineer, Gaming Laboratories International (GLI)', location: 'Burnaby, BC', dates: 'October 2022 – March 2025', bullets: 7 },
+      { id: 'altera', title: 'QA Engineer, Altera Digital Health', location: 'Remote, Canada', dates: 'March 2025 – October 2026', bullets: 8 },
+    ];
+    for (const job of jobs) {
+      const stage = page.locator(`#stage-${job.id}`);
+      const log = page.locator(`#stage-${job.id}-log`);
+      await expect(stage.locator('.stage__dates')).toHaveText(job.dates);
+      if ((await stage.getAttribute('aria-expanded')) !== 'true') await stage.click();
+      await expect(log.getByRole('heading')).toHaveText(job.title);
+      await expect(log.locator('.log__meta')).toContainText(job.location);
+      await expect(log.locator('.log__lines li')).toHaveCount(job.bullets);
+    }
+    // The run summary covers August 2020 – October 2026.
+    await expect(page.locator('.run')).toContainText('4 stages');
+    await expect(page.locator('.run')).toContainText('6+ years');
   });
 
   test('the most recent job is open by default', async ({ page }) => {
     await expect(page.locator('#stage-altera')).toHaveAttribute('aria-expanded', 'true');
     await expect(page.locator('#stage-altera-log')).toBeVisible();
-    await expect(page.locator('#stage-altera-log')).toContainText('16-month project');
+    await expect(page.locator('#stage-altera-log')).toContainText('16-month feature');
   });
 
   test('stages open and close with Enter and Space, one at a time', async ({ page }) => {

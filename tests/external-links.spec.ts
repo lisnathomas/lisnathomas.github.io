@@ -6,12 +6,7 @@ import { expect, test } from './support/fixtures';
  * the test fails too, so the list never goes stale. Remove an entry once the
  * link is fixed.
  */
-const KNOWN_BROKEN: Record<string, string> = {
-  'https://github.com/lisnathomas/openmrs-ai-test-automation':
-    'Repository not public yet (or renamed; a public repo "OpenMrs.AiTests" exists).',
-  'https://lisnathomas.github.io/openmrs-ai-test-automation/sample-run/report.html':
-    'Sample report is not published on GitHub Pages yet.',
-};
+const KNOWN_BROKEN: Record<string, string> = {};
 
 /** Sites that block automated requests; their URLs are format-checked only. */
 const UNVERIFIABLE_HOSTS = ['www.linkedin.com', 'linkedin.com'];

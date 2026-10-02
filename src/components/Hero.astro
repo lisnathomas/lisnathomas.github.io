@@ -73,8 +73,8 @@ const doneAt = firstTest + heroSpec.tests.length * step + 150;
         <a class="btn btn--primary" href="#projects">
           <Icon name="arrowDown" /> View projects
         </a>
-        <a class="btn" href={person.github} rel="me">
-          <Icon name="github" /> GitHub
+        <a class="btn" href={person.github} rel="me noopener" target="_blank">
+          <Icon name="github" /> GitHub<span class="sr-only"> (opens in a new tab)</span>
         </a>
         {
           isTodo(person.resume) ? (

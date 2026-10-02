@@ -3,7 +3,7 @@ import Icon from './Icon.astro';
 import Monogram from './Monogram.astro';
 import SectionHeading from './SectionHeading.astro';
 import TodoMark from './TodoMark.astro';
-import { about, isTodo, person } from '../data/profile';
+import { about, education, isTodo, person } from '../data/profile';
 import { practitioner, practitionerJson } from '../data/fhir';
 import { highlightJson } from '../lib/highlight-json';
 
@@ -65,29 +65,34 @@ const jsonHtml = highlightJson(practitionerJson);
               <dd><a href={`mailto:${person.email}`}>{person.email}</a></dd>
             </div>
             <div>
-              <dt>Qualifications</dt>
-              <dd>
-                <ul role="list" class="fields__list">
-                  {about.qualifications.map((q) => <li>{q}</li>)}
-                </ul>
-              </dd>
-            </div>
-            <div>
               <dt>Education</dt>
               <dd>
-                {isTodo(person.education) ? <TodoMark label={person.education.todo} /> : person.education}
+                <ul role="list" class="fields__list" data-testid="education">
+                  {
+                    education.map((e) => (
+                      <li>
+                        <span class="fields__degree">{e.degree}</span>
+                        <span class="muted">
+                          {e.school}, {e.place} · {e.dates}
+                        </span>
+                      </li>
+                    ))
+                  }
+                </ul>
               </dd>
             </div>
             <div>
               <dt>Links</dt>
               <dd class="fields__links">
-                <a href={person.github} rel="me">GitHub</a>
+                <a href={person.github} rel="me noopener" target="_blank">
+                  GitHub<span class="sr-only"> (opens in a new tab)</span>
+                </a>
                 {
                   isTodo(person.linkedin) ? (
                     <TodoMark label={person.linkedin.todo} />
                   ) : (
-                    <a href={person.linkedin} rel="me">
-                      LinkedIn
+                    <a href={person.linkedin} rel="me noopener" target="_blank">
+                      LinkedIn<span class="sr-only"> (opens in a new tab)</span>
                     </a>
                   )
                 }
@@ -293,7 +298,17 @@ const jsonHtml = highlightJson(practitionerJson);
   }
 
   .fields__list {
+    display: grid;
+    gap: var(--space-3);
     margin: 0;
+  }
+
+  .fields__list li {
+    display: grid;
+  }
+
+  .fields__degree {
+    font-weight: 600;
   }
 
   .fields__links {

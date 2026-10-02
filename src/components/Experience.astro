@@ -6,6 +6,9 @@ import { isTodo, stages } from '../data/profile';
 
 /** The most recent job is open by default so the details are visible at once. */
 const defaultOpen = 'altera';
+
+/** Keeps "October 2022" together, so a narrow stage wraps after the dash instead. */
+const keepMonthWithYear = (dates: string) => dates.replace(/ (\d{4})/g, ' $1');
 ---
 
 <section id="experience" class="section" aria-labelledby="experience-title">
@@ -48,7 +51,7 @@ const defaultOpen = 'altera';
                 <span class="stage__role">{stage.role}</span>
                 {stage.dates !== null && (
                   <span class="stage__dates mono">
-                    {isTodo(stage.dates) ? <TodoMark label={stage.dates.todo} /> : stage.dates}
+                    {isTodo(stage.dates) ? <TodoMark label={stage.dates.todo} /> : keepMonthWithYear(stage.dates)}
                   </span>
                 )}
               </button>

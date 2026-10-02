@@ -99,6 +99,29 @@ test.describe('Navigation', () => {
     }
   });
 
+  test('every external link opens in a new tab, safely, and says so', async ({ page }) => {
+    const links = await page.locator('a[href^="http"]').evaluateAll((as) =>
+      as.map((a) => ({
+        href: a.getAttribute('href')!,
+        target: a.getAttribute('target'),
+        rel: (a.getAttribute('rel') ?? '').split(/\s+/),
+        text: a.textContent ?? '',
+      })),
+    );
+    expect(links.length).toBeGreaterThan(5);
+    for (const { href, target, rel, text } of links) {
+      expect(target, href).toBe('_blank');
+      expect(rel, href).toContain('noopener');
+      // Screen reader users hear that a new tab will open.
+      expect(text, href).toMatch(/opens in a new tab/);
+    }
+
+    // In-page links and the resume download stay in the same tab.
+    const local = await page.locator('a[href^="#"], a[href^="/"]').evaluateAll((as) => as.map((a) => a.getAttribute('target')));
+    expect(local.length).toBeGreaterThan(5);
+    expect(local.every((target) => target === null)).toBe(true);
+  });
+
   test('email links all point at the right address', async ({ page }) => {
     const mailtos = await page
       .locator('a[href^="mailto:"]')

@@ -66,7 +66,9 @@ const fallbackHref = buildMailto(person.email, { summary: '', details: '', expec
           </li>
           <li>
             <Icon name="github" />
-            <a href={person.github} rel="me">github.com/lisnathomas</a>
+            <a href={person.github} rel="me noopener" target="_blank">
+              github.com/lisnathomas<span class="sr-only"> (opens in a new tab)</span>
+            </a>
           </li>
           <li>
             <Icon name="linkedin" />
@@ -74,8 +76,8 @@ const fallbackHref = buildMailto(person.email, { summary: '', details: '', expec
               isTodo(person.linkedin) ? (
                 <TodoMark label={person.linkedin.todo} />
               ) : (
-                <a href={person.linkedin} rel="me">
-                  LinkedIn
+                <a href={person.linkedin} rel="me noopener" target="_blank">
+                  LinkedIn<span class="sr-only"> (opens in a new tab)</span>
                 </a>
               )
             }
